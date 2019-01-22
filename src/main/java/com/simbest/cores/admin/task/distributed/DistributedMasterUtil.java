@@ -153,6 +153,16 @@ public class DistributedMasterUtil {
 //    }
     public static String getServerIP(){
         String ip = System.getProperty("reyo.localIp");
+        if (StringUtils.isEmpty(ip)) {
+            ip = "localhost";
+            try {
+                List<Inet4Address> ipList = getInet4Addresses();
+                if(!ipList.isEmpty())
+                    ip = ipList.get(0).getHostAddress();
+            } catch (SocketException e) {
+                e.printStackTrace();
+            }
+        }
         return ip;
     }
 
