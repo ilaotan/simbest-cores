@@ -31,7 +31,9 @@ import javax.imageio.ImageWriteParam;
 import javax.imageio.ImageWriter;
 import javax.imageio.stream.FileImageOutputStream;
 import javax.imageio.stream.ImageOutputStream;
+import javax.swing.*;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -372,6 +374,35 @@ public class AppFileUtils {
         return savePath;
     }
 
+    public BufferedImage toBufferedImage(Image image) {
+        if (image instanceof BufferedImage) {
+            return (BufferedImage) image;
+        }
+        // This code ensures that all the pixels in the image are loaded
+        image = new ImageIcon(image).getImage();
+        BufferedImage bimage = null;
+        GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        try {
+            int transparency = Transparency.OPAQUE;
+            GraphicsDevice gs = ge.getDefaultScreenDevice();
+            GraphicsConfiguration gc = gs.getDefaultConfiguration();
+            bimage = gc.createCompatibleImage(image.getWidth(null), image.getHeight(null), transparency);
+        } catch (HeadlessException e) {
+            // The system does not have a screen
+        }
+        if (bimage == null) {
+            // Create a buffered image using the default color model
+            int type = BufferedImage.TYPE_INT_RGB;
+            bimage = new BufferedImage(image.getWidth(null), image.getHeight(null), type);
+        }
+        // Copy image to buffered image
+        Graphics g = bimage.createGraphics();
+        // Paint the image onto the buffered image
+        g.drawImage(image, 0, 0, null);
+        g.dispose();
+        return bimage;
+    }
+
     /**
      * 将图片生成文件，并存放在应用系统Context路径下，或者上传至云存储
      *
@@ -413,7 +444,11 @@ public class AppFileUtils {
         ByteArrayInputStream bais = null;
         ImageWriter writer;
         try {
-            BufferedImage image = ImageIO.read(imageFile);
+//            BufferedImage image = ImageIO.read(imageFile);
+//            java上传图片，压缩、更改尺寸等导致变色（表层蒙上一层红色）
+//            https://blog.csdn.net/qq_25446311/article/details/79140008?tdsourcetag=s_pctim_aiomsg
+            Image bufferedImage = Toolkit.getDefaultToolkit().getImage(imageFile.getAbsolutePath());
+            BufferedImage image = this.toBufferedImage(bufferedImage);// Image to BufferedImage
             Iterator<ImageWriter> writers = ImageIO.getImageWritersBySuffix("jpg");
             if (!writers.hasNext())
                 throw new IllegalStateException("No writers found");
