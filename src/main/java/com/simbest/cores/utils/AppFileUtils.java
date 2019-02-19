@@ -121,11 +121,10 @@ public class AppFileUtils {
 
         System.out.println(StringUtils.substringAfterLast("http://bj.bcebos.com/v1/onegymbucket/static/uploadFiles/manager1/2015-11-12/483bdc2b9ee8413d99e91293237615c9/ccc.jpg", "onegymbucket/"));
 
-        String fileUrl = "http://10.87.13.157:9011/fileWeb/CSAOFWeb/魏总2修.jpg";
-        URL url = new URL(FilenameUtils.getFullPath(fileUrl) + Encodes.urlEncode(getFileName(fileUrl)));
-        String storeFile = "D:\\data\\files\\images\\oa\\news\\魏总2修1111111111111.jpg";
-        FileUtils.copyURLToFile(url, new File(storeFile));
-        utils.uploadCompressImage(new File(storeFile), 0.7f, "D:\\data\\files\\images\\oa\\news\\");
+        //String fileUrl = "http://10.87.13.157:9011/fileWeb/CMSWeb/1245_2.jpg";
+        String fileUrl = "http://10.87.13.157:9011/fileWeb/CMSWeb/1245.bmp";
+        String compressFilePath = utils.uploadCompressImageFromUrl(fileUrl, 0.7f, "D:\\data\\files\\images\\oa\\news\\");
+        System.out.println(compressFilePath);
     }
 
     public File downloadFromUrl(String fileUrl, String fileName, String storePath) {
@@ -444,11 +443,16 @@ public class AppFileUtils {
         ByteArrayInputStream bais = null;
         ImageWriter writer;
         try {
-//            BufferedImage image = ImageIO.read(imageFile);
+            BufferedImage image = null;
+            if(getFileExtByName(imageFile.getName()).equalsIgnoreCase("bmp")){
+                image = ImageIO.read(imageFile);
+            } else {
+                //
 //            java上传图片，压缩、更改尺寸等导致变色（表层蒙上一层红色）
 //            https://blog.csdn.net/qq_25446311/article/details/79140008?tdsourcetag=s_pctim_aiomsg
-            Image bufferedImage = Toolkit.getDefaultToolkit().getImage(imageFile.getAbsolutePath());
-            BufferedImage image = this.toBufferedImage(bufferedImage);// Image to BufferedImage
+                Image bufferedImage = Toolkit.getDefaultToolkit().getImage(imageFile.getAbsolutePath());
+                image = this.toBufferedImage(bufferedImage);// Image to BufferedImage
+            }
             Iterator<ImageWriter> writers = ImageIO.getImageWritersBySuffix("jpg");
             if (!writers.hasNext())
                 throw new IllegalStateException("No writers found");
@@ -543,7 +547,7 @@ public class AppFileUtils {
             String tempFileName = getFileBaseName(fileUrl);
             if(StringUtils.length(tempFileName) <= 3)
                 tempFileName  = AppCodeGenerator.nextDateTimeCode() + tempFileName;
-            File imageFile = File.createTempFile(tempFileName, ".jpg");
+            File imageFile = File.createTempFile(tempFileName, "."+getFileExtByName(fileUrl));
             log.debug("----Info imageFile path is:" + imageFile.getPath());
             FileUtils.copyURLToFile(url, imageFile);
             return uploadCompressImage(imageFile, quality, storePath);
