@@ -623,7 +623,7 @@
 	      <if test="groupid != null and groupid != ''">groupid=#{groupid},</if>
 	      <if test="backgroundurl != null and backgroundurl != ''">backgroundurl=#{backgroundurl},</if>
 	      <if test="signature != null and signature != ''">signature=#{signature},</if>
-	      <if test="birthDate != null and birthDate != ''">birthDate=#{birthDate},</if>
+	      <if test="birthDate != null">birthDate=#{birthDate},</if>
 	      <if test="enabled != null">enabled=#{enabled},</if>
 	      <if test="removed != null">removed=#{removed},</if>
 	      <if test="sysOrg != null and sysOrg.id != null">org_id=#{sysOrg.id},</if>
