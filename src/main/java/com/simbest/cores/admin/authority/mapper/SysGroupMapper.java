@@ -19,6 +19,8 @@ public interface SysGroupMapper extends IGenericMapper<SysGroup, Integer> {
 
     List<String> getGroupUser(@Param(value = "groupid") Integer groupid);
 
+    List<String> getGroupUserByYear(@Param(value = "groupid") Integer groupid,@Param(value = "year") Integer year);
+
     /**
      * 根据组id和用户id删除关联信息
      */

@@ -62,4 +62,9 @@ public class SysGroupAdvanceService extends GenericAdvanceService<SysGroup, Inte
         return sysGroupService.getGroupUser(groupid);
     }
 
+    @Override
+    public List<String> getGroupUserByYear(Integer groupid, Integer year) {
+        return sysGroupService.getGroupUserByYear(groupid,year);
+    }
+
 }

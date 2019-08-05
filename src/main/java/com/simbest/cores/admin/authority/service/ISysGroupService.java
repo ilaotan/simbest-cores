@@ -17,4 +17,6 @@ public interface ISysGroupService extends IGenericService<SysGroup, Integer> {
     List<SysGroup> getByUser(Integer userId);
 
     List<String> getGroupUser(Integer groupid);
+
+    List<String> getGroupUserByYear(Integer groupid,Integer year);
 }

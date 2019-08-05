@@ -25,7 +25,9 @@
     <select id='getGroupUser' parameterType='Integer' resultType="String">
         SELECT u.usercode FROM sys_user u, sys_user_group ug WHERE u.id=ug.user_id and ug.group_id = #{groupid}
     </select>
-
+    <select id='getGroupUserByYear' parameterType='Integer' resultType="String">
+        SELECT u.usercode FROM sys_user u, sys_user_group ug WHERE u.id=ug.user_id and ug.group_id = #{groupid} and ug.year=#{year}
+    </select>
     <select id="getAll" resultMap="simpleGroupResult">
         select * from sys_group
         <where>

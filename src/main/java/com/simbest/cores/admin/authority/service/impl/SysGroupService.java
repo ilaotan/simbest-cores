@@ -48,4 +48,9 @@ public class SysGroupService extends GenericMapperService<SysGroup, Integer> imp
     public List<String> getGroupUser(Integer groupid) {
         return mapper.getGroupUser(groupid);
     }
+
+    @Override
+    public List<String> getGroupUserByYear(Integer groupid, Integer year) {
+        return mapper.getGroupUserByYear(groupid,year);
+    }
 }
