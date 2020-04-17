@@ -4,15 +4,22 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import org.apache.commons.beanutils.BeanUtils;
 import org.apache.poi.hssf.usermodel.DVConstraint;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
+import org.apache.poi.hssf.usermodel.HSSFDataFormat;
 import org.apache.poi.hssf.usermodel.HSSFDataValidation;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
@@ -21,6 +28,7 @@ import org.apache.poi.hssf.util.CellRangeAddressList;
 import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -369,6 +377,37 @@ public class ExcelUtil2<T> {
 
 			int startNo = 0;
 			int endNo = list.size();
+			
+			/*设置数据行单元格格式*/
+			HSSFCellStyle cessStyle = workbook.createCellStyle();
+			cessStyle.setFillForegroundColor(HSSFColor.SKY_BLUE.index);
+			cessStyle.setFillBackgroundColor(HSSFColor.GREY_40_PERCENT.index);
+			cessStyle.setBorderBottom(HSSFCellStyle.BORDER_THIN); //下边框    
+			cessStyle.setBorderLeft(HSSFCellStyle.BORDER_THIN);//左边框    
+			cessStyle.setBorderTop(HSSFCellStyle.BORDER_THIN);//上边框    
+			cessStyle.setBorderRight(HSSFCellStyle.BORDER_THIN);//右边框 
+			cessStyle.setAlignment(HSSFCellStyle.ALIGN_CENTER); // 居中 
+			font.setFontHeightInPoints((short)12); //字体大小
+			font.setBoldweight(Font.BOLDWEIGHT_NORMAL);		
+			cessStyle.setFont(font);
+			cessStyle.setDataFormat((short)0);
+			
+			
+			HSSFCellStyle dateStyle = workbook.createCellStyle();
+			dateStyle.setFillForegroundColor(HSSFColor.SKY_BLUE.index);
+			dateStyle.setFillBackgroundColor(HSSFColor.GREY_40_PERCENT.index);
+			dateStyle.setBorderBottom(HSSFCellStyle.BORDER_THIN); //下边框    
+			dateStyle.setBorderLeft(HSSFCellStyle.BORDER_THIN);//左边框    
+			dateStyle.setBorderTop(HSSFCellStyle.BORDER_THIN);//上边框    
+			dateStyle.setBorderRight(HSSFCellStyle.BORDER_THIN);//右边框 
+			dateStyle.setAlignment(HSSFCellStyle.ALIGN_CENTER); // 居中 
+			font.setFontHeightInPoints((short)12); //字体大小
+			font.setBoldweight(Font.BOLDWEIGHT_NORMAL);		
+			dateStyle.setFont(font);
+			HSSFDataFormat format= workbook.createDataFormat();
+			dateStyle.setDataFormat(format.getFormat("yyyy-mm-dd"));
+			
+			Set<Integer> dateList = new HashSet<Integer>();
 			// 写入各条记录,每条记录对应excel表中的一行
 			for (int i = startNo; i < endNo; i++) {
 				row = sheet.createRow(i + 1 - startNo);				
@@ -383,21 +422,38 @@ public class ExcelUtil2<T> {
 						if (attr.isExport()) {
 							cell = row.createCell(getExcelCol(attr.column()));// 创建cell
 							cell.setCellType(HSSFCell.CELL_TYPE_STRING);
-							cell.setCellValue(field.get(vo) == null ? ""
-									: String.valueOf(field.get(vo)));// 如果数据存在就填入,不存在填入空格.
+							Object cellValue = field.get(vo);
+							if(cellValue==null){
+								cell.setCellValue("");
+								cell.setCellType(HSSFCell.CELL_TYPE_STRING);
+								cell.setCellStyle(cessStyle);
+							}else if(cellValue instanceof BigDecimal){
+								cell.setCellValue(((BigDecimal) cellValue).doubleValue());
+								cell.setCellType(HSSFCell.CELL_TYPE_NUMERIC);
+								cell.setCellStyle(cessStyle);
+							}else if(cellValue instanceof Date){
+								dateList.add(cell.getColumnIndex());
+								cell.setCellValue(((Date)cellValue));
+								cell.setCellStyle(dateStyle);
+							}else if(cellValue instanceof Integer){
+								cell.setCellValue(((Integer)cellValue).doubleValue());
+								cell.setCellType(HSSFCell.CELL_TYPE_NUMERIC);
+								cell.setCellStyle(cessStyle);
+							}else{
+								cell.setCellValue(String.valueOf(cellValue));
+								cell.setCellType(HSSFCell.CELL_TYPE_STRING);
+								cell.setCellStyle(cessStyle);
+							}
 							if(field.get(vo) != null){
 								String value = field.get(vo)+"";
-								//int iLength = value.getBytes().length*256*2;
 								int iLength = value.length()*256%2;
 								if(iLength>intArray[j]){
 									intArray[j] = iLength;//设置列宽
 									sheet.setColumnWidth(j, iLength);//手动设置列宽
 								}
 							}
-							font.setFontHeightInPoints((short)12); //字体大小
-							font.setBoldweight(Font.BOLDWEIGHT_NORMAL);		
-							style.setFont(font);
-							cell.setCellStyle(style);
+							
+							
 						}
 					} catch (IllegalArgumentException e) {
 						e.printStackTrace();
