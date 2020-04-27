@@ -389,8 +389,13 @@ public class FileUploaderController extends LogicController<FileUploader, Long>{
 		try {
 			String filename = fUploader.getFinalName();
 			response.reset();  
-			if (request.getHeader( "USER-AGENT" ).toLowerCase().indexOf( "msie" ) >  0 )//ie浏览器空格处理
-            {
+			//https://blog.csdn.net/p793049488/article/details/79818272
+			//https://blog.csdn.net/qq_27828675/article/details/73274671
+			String agent = request.getHeader("User-Agent");
+			boolean isMSIE = ((agent != null && agent.indexOf("MSIE") != -1 ) || ( null != agent && -1 != agent.indexOf("like Gecko")));
+			//if (request.getHeader( "USER-AGENT" ).toLowerCase().indexOf( "msie" ) >  0 )//ie浏览器空格处理
+            if(isMSIE)
+			{
 				filename = URLEncoder.encode(filename, "utf-8");
 				filename = filename.replace("+", "%20");// 处理空格变“+”的问题
 				response.setHeader("Content-disposition", "attachment; filename=" + filename);
