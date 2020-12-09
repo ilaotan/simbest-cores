@@ -3,6 +3,7 @@ package com.simbest.cores.web;
 import com.wordnik.swagger.annotations.ApiOperation;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
 @Controller
@@ -10,7 +11,7 @@ import org.springframework.web.servlet.ModelAndView;
         "/action"}) //后台管理跳转，Shrio拦截校验权限
 public class IndexController {
 
-    @RequestMapping("/")
+    @RequestMapping(value = "/", method = {RequestMethod.POST, RequestMethod.GET})
     @ApiOperation(value = "项目首页", httpMethod = "GET", consumes="application/x-www-form-urlencoded", response = ModelAndView.class)
     public ModelAndView index() {
         ModelAndView mav = new ModelAndView("index");
