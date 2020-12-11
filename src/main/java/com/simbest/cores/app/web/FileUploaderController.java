@@ -361,7 +361,7 @@ public class FileUploaderController extends LogicController<FileUploader, Long>{
 		}
 	} 
 	
-	@RequestMapping(value = "/dowanloadSourceFile", method = RequestMethod.GET)
+	@RequestMapping(value = "/dowanloadSourceFileNew", method = RequestMethod.GET)
     @ApiOperation(value = "下载文件", httpMethod = "GET", notes = "以流的方式下载文件")
 	public void dowanloadSourceFile(Long id,HttpServletRequest request, HttpServletResponse response) throws IOException {
 		ShiroUser user = appUserSession.getCurrentUser();
